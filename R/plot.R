@@ -1,0 +1,329 @@
+#' Theme for Swedish Butterfly Monitoring scheme for use in ggplot
+#' 
+#' @param title_sz font size for title
+#' @param x_title_sz font size for x axis title
+#' @param y_title_sz font size for y axis title
+#' @param x_sz font size for x axis text
+#' @param y_sz font size for y axis text
+#' @param legend_position char indicating legend_position such as "none"
+#' @return a theme that can be used for ggplot plot objects
+#' @importFrom ggplot2 theme_bw theme_set theme_update element_text element_blank
+#' @export
+theme_sebms <- function(title_sz = 24, 
+  x_title_sz = 16, y_title_sz = 16, 
+  x_sz = 20, y_sz = 20, legend_position) 
+{
+  
+  theme_sb <- theme_set(theme_bw())
+
+  theme_sb <- theme_update(
+    plot.title = element_text(size = 24, face = "bold", 
+      margin = margin(0, 0, 25, 0)),
+    axis.text.x = element_text(size = x_sz, 
+      margin = margin(10, 0, 0, 0)),
+    axis.text.y = element_text(size = y_sz, 
+      margin = margin(0, 10, 0, 0)),
+    axis.title.x = element_text(size = x_title_sz, face = "bold", 
+      margin = margin(0, 20, 0, 0), angle = 90),
+    axis.title.y = element_text(size = y_title_sz, face = "bold", 
+      margin = margin(0, 20, 0, 0), angle = 90),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.y = element_line(size = 0.5, colour = "grey"),
+    panel.background = element_rect(size = 0.5),
+    strip.background = element_blank()
+  )
+  
+  if (!missing(legend_position))
+    theme_sb <- theme_update(legend.position = legend_position)
+  
+  return (theme_sb)
+}
+
+#' Palette used in plots
+#' @return vector of color hex codes
+#' @export
+sebms_palette <- c("#9BBB59", "#C0504D")
+
+#' Plot precipitation for 2015
+#' @import ggplot2
+#' @noRd
+sebms_precip_plot <- function(my_place) {
+  
+  nb <- 
+    sebms_data_precip_2015 %>% 
+    filter(place == my_place) %>%
+    arrange(month, period.name)
+  
+  col_palette <- c("#9BBB59", "#C0504D")
+  #http://colorbrewer2.org/#type=diverging&scheme=RdYlGn&n=5
+  #col_palette <- c("#a6d96a", "#d7191c")
+  
+  g <- 
+    ggplot(nb, aes(
+      x = reorder(month.name, month), 
+      y = nb, 
+      fill = reorder(period.name, period))) + 
+  #  facet_grid(. ~ place) +
+    facet_wrap(~ place, ncol = 1) +
+    geom_bar(stat = "identity", position = "dodge", width = .7) + 
+    scale_fill_manual(values = col_palette) + 
+    guides(fill = FALSE) + 
+    ylim(0, 250) + 
+    ylab("Nederbörd (mm)") + 
+    xlab("") + 
+  #  ggtitle(nb$place) + 
+    theme_sebms() +
+    theme(strip.background = element_blank()) +
+    theme(panel.border = element_rect(color = "grey"))
+  
+  return (g)
+}
+
+#' Plot temperatures for 2015
+#' @import ggplot2
+#' @noRd
+sebms_temp_plot <- function(my_place) {
+  
+  temp <- 
+    sebms_data_temp_2015 %>% 
+    filter(place == my_place) %>% 
+    rename(Period = period.name)
+  
+  #library(RColorBrewer)
+  # BFB8AF D6D2C4 ADCAB8 B9D3DC E9C4C7 9C6114 000080
+  #RColorBrewer::brewer.pal(7, "RdYlGn")
+  #RColorBrewer::display.brewer.pal(7, "RdYlGn")
+  # "#D73027" "#FC8D59" "#FEE08B" "#FFFFBF" "#D9EF8B" "#91CF60" "#1A9850"
+  
+  #col_pal_temp <- c("#D73027", "#1A9850")
+  col_pal_temp <- c("#C0504D", "#9BBB59")
+  
+  g <- 
+    ggplot(temp, aes(x = reorder(month.name, month), 
+      y = temp, group = Period, linetype = Period, 
+      colour = Period)) + 
+    ylab("Temperatur (°C)") + 
+    xlab("") + 
+    facet_wrap(~ place, ncol = 1) +
+    geom_line(stat = "identity", size = 1) +
+    scale_linetype_manual(values = c("dashed", "solid")) +
+    scale_color_manual(values = col_pal_temp) + 
+    ylim(0,25) + 
+  #  ggtitle(temp$place) + 
+    theme_sebms() + #title_sz = 32, x_title_sz = 22, 
+      #y_title_sz = 24, y_sz = 28, legend_position = "none") +
+    theme(legend.position = "none", 
+      #    strip.text.x = element_text(size = 22)
+          strip.background = element_blank(),
+          panel.border = element_rect(color = "grey"))
+    #guide_legend(label.position = "none")
+  
+  g
+}
+
+#' Plot of temperature and precipitation data for 2015
+#' 
+#' @return a ggplot plot object
+#' @import ggplot2
+#' @importFrom purrr map map2
+#' @importFrom magick image_append image_read
+#' @export
+#' 
+sebms_precip_temp_2015_plot <- function() {
+
+  cities <- c("Umeå", "Stockholm", "Visby", "Lund")
+
+  save_pplot <- function(g, fn, w = 5, h = 3.5) {
+    ggsave(
+      filename = fn, 
+      plot = g, device = "png", 
+      width = w, height = h)
+  }
+  
+  pplots <- map(cities, sebms_precip_plot)
+  map2(pplots, paste0("/tmp/precip-", cities), save_pplot)
+  
+  tplots <- map(cities, sebms_temp_plot)
+  map2(tplots, paste0("/tmp/temp-", cities), save_pplot)
+  
+  stack_right <- image_append(stack = TRUE,
+    image_read(paste0("/tmp/precip-", cities))
+  )
+  
+  stack_left <- image_append(stack = TRUE,
+    image_read(paste0("/tmp/temp-", cities))
+  )
+  
+  stack <- image_append(c(
+    stack_left,
+    stack_right
+  ))
+  
+  stack
+  
+}
+
+#' Saves a ggplot object as a PNG file, resizing using pixel dimensions and a text scaling factor
+#' 
+#' @param plot a ggplot object
+#' @param width pixel width
+#' @param height pixel height
+#' @param text.factor text scaling factor (default is 1)
+#' @param filename the path to the output file
+#' @importFrom ggplot2 ggsave
+#' @export
+sebms_ggsave <- function(plot, width = 800, height = 500, 
+  text.factor = 1, filename) 
+{
+  dpi <- text.factor * 100
+  width.calc <- width / dpi
+  height.calc <- height / dpi
+  
+  ggsave(device = "png", filename = filename, plot = plot,
+    dpi = dpi, width = width.calc, height = height.calc, units = 'in')
+}
+
+
+#' Cumulative specielist plots
+#' @import dplyr
+#' @import ggplot2
+#' @return a list with two ggplot objects, named p1 and p2
+#' @export
+#' 
+sebms_specieslist_cum_plots <- function() {
+
+  n <- nrow(sebms_data_specieslist_cum)
+  col_palette <- sebms_palette
+
+  s1 <- 
+    sebms_data_specieslist_cum %>% 
+    filter(count >= 200)
+  #  slice(1 : floor(n/2))
+
+  s2 <- 
+    sebms_data_specieslist_cum %>% 
+    filter(count < 200)
+  #  slice(-c(1 : floor(n/2)))
+
+  p1 <- 
+    ggplot(data = s1, 
+    aes(x = reorder(name, count), y = count)) +
+    geom_bar(stat='identity', color = col_palette[1], 
+       fill = col_palette[1], width = 0.5) +
+    geom_text(aes(label = count), colour = "grey10", hjust = -0.5, size = 2.5) +
+    xlab("") + ylab("") +
+    ggtitle("Antal individer (n >= 200)") +
+    scale_y_continuous(breaks = c(1000 * 1:12), labels = c(1000 * 1:11, ""),
+       position = "top", limits = c(0, 12000), expand = c(0, 0)) +
+    theme_sebms() +
+    theme(
+      panel.grid.major.x = element_line(color = "darkgray"),
+      panel.grid.major.y = element_blank(),
+      panel.border = element_blank(),
+      axis.text.x.top = element_text(color = "darkgray"),
+      axis.ticks.y = element_blank(),
+      axis.line = element_line(color = "darkgray"),
+      plot.title = element_text(hjust = 0.5)) +
+    coord_flip()
+
+  p2 <- 
+    ggplot(data = s2, 
+    aes(x = reorder(name, count), y = count)) +
+    geom_bar(stat='identity', color = col_palette[1], fill = col_palette[1], width = 0.5) +
+    geom_text(aes(label = count), colour = "grey10", hjust = -0.5, size = 2.5) +
+    xlab("") + ylab("") +
+    ggtitle("Antal individer (n < 200)") +
+    scale_y_continuous(breaks = c(20 * 1:11), labels = c(20 * 1:10, ""),
+       position = "top", limits = c(0, 210), expand = c(0, 0)) +
+    theme_sebms() +
+    theme(panel.grid.major.x = element_line(color = "darkgray"),
+          panel.grid.major.y = element_blank(),
+          panel.border = element_blank(),
+          axis.text.x.top = element_text(color = "darkgray"),
+          axis.ticks.y = element_blank(),
+          axis.line = element_line(color = "darkgray"),
+          plot.title = element_text(hjust = 0.5)) +
+    coord_flip()
+  
+  res <- list(p1 = p1, p2 = p2)
+    
+}
+
+#' Species histo plot
+#' @import dplyr
+#' @import ggplot2
+#' @export
+#' 
+sebms_species_histo_plot <- function() {
+
+  col_palette <- sebms_palette
+  
+  df <- 
+    sebms_data_species_histo %>%
+    group_by(artnamn, vecka) %>%
+    summarise(count = sum(sumval))
+  
+  p <- ggplot(data = df, 
+  aes(x = vecka, y = count)) +
+  geom_bar(stat = 'identity', color = col_palette[1], fill = col_palette[1], width = 0.5) +
+  xlab("") + ylab("") +
+  scale_y_continuous(breaks = c(10 * 1:10), limits = c(0, 100), expand = c(0, 0)) +
+  scale_x_continuous(
+    minor_breaks = c(14:42), 
+    breaks = c(13, 18, 22, 26, 31, 35, 40), 
+    labels = c("april", "maj", "juni", "juli", "augusti", "september", "oktober"),
+    limits = c(12, 42), expand = c(0, 0), 
+    sec.axis = sec_axis( ~ ., breaks = c(12:42), 
+      labels = c("", paste0("v", c(13:41)), ""))) +
+  theme_sebms() +
+  theme(panel.grid.major.y = element_line(color = "gray"),
+        panel.grid.minor.x = element_line(color = "gray"),
+        panel.grid.major.x = element_line(color = "gray40"),
+        axis.ticks.x = element_line(color = "gray5"),
+        axis.line = element_line(color = "gray5"),
+        plot.title = element_text(hjust = 0.5))
+  
+  return (p)
+}
+
+#' Species per site and sitetype histo plot
+#' @import dplyr
+#' @import ggplot2
+#' @export
+#' 
+sebms_species_per_site_sitetype_plot <- function() {
+
+  b <- seq(1, 50, by = 5)
+  l <- paste0(b, "-", b + 4)
+
+  sebms_spss <- 
+    sebms_data_species_per_site_sitetype %>%
+    mutate(
+      interval = l[findInterval(species, b)], 
+      sortorder = findInterval(species, b)) %>%
+    group_by(interval, sortorder, sitetype) %>%
+    summarize(site_count = n_distinct(id)) %>%
+    arrange(-desc(sortorder)) %>%
+    select(interval, sortorder, sitetype, site_count)
+
+  col_palette <- sebms_palette
+  
+  #sbm_spss$sitetype <- factor(sbm_spss$sitetype)
+  
+  ggplot(data = sebms_spss, aes(x = reorder(interval, sortorder), 
+    y = site_count, fill = sitetype)) +
+  geom_bar(aes(fill = sitetype), stat = "identity", 
+    position = position_dodge(), width = 0.7) +
+  xlab("Antal olika arter på lokalen") + ylab("Antal lokaler") +
+  scale_y_continuous(breaks = c(10 * 1:10), limits = c(0, 100), expand = c(0, 0)) +
+  scale_fill_manual("Metod", values = c("P" = col_palette[1], "T" = col_palette[2])) +
+  theme_sebms() +
+  theme(panel.grid.major.y = element_line(color = "gray"),
+        panel.grid.minor.x = element_line(color = "gray"),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(color = "gray5"),
+        plot.title = element_text(hjust = 0.5))
+
+}

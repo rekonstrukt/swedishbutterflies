@@ -1,0 +1,28 @@
+Package: swedishbutterflies
+Title: Swedish Butterfly Monitoring Programme Tools
+Version: 0.0.0.9000
+Authors@R: person("Markus", "Skyttner", email = "markus.skyttner@nrm.se", role = c("aut", "cre"))
+Description: Provides tools for working with data from the Swedish Butterfly Monitoring scheme.
+Depends: R (>= 3.4.4)
+License: Affero GPLv3
+Encoding: UTF-8
+LazyData: true
+Imports: ggplot2,
+    pool,
+    DBI,
+    RPostgres,
+    dplyr,
+    magick,
+    purrr,
+    rstudioapi,
+    tibble,
+    jsonlite,
+    tidyr,
+    lubridate,
+    shiny,
+    DT
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
