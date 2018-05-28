@@ -27,11 +27,15 @@ Use runShinyApp('poc') to run the Shiny proof-of-concept app"
   # do something with conn
   #poolReturn(conn)  
   #}
-  readRenviron("~/repos/rekonstrukt/swedishbutterflies/.Renviron")
-  sebms_pool <<- sebms_connect()
+  pool <- swedishbutterflies:::sebms_connect()
+  if (is.null(pool)) 
+    message("Please enable db connections (run tunnels?)")
+  else
+    sebms_pool <<- pool
 }
 
 .onDetach <- function(libpath) {
+  
   message("Closing sebms connection pool")
   pool::poolClose(sebms_pool)
 }

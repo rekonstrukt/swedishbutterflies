@@ -20,7 +20,12 @@ Imports: ggplot2,
     tidyr,
     lubridate,
     shiny,
-    DT
+    DT,
+    shinydashboard,
+    shinyjs,
+    leaflet,
+    rappdirs,
+    config
 RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown,

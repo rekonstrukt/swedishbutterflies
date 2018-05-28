@@ -1,13 +1,37 @@
 #' @importFrom RPostgres Postgres
 #' @importFrom pool dbPool
 #' @importFrom rstudioapi askForPassword
+#' @importFrom config get
+#' @importFrom rappdirs app_dir
 sebms_connect <- function() {
-  pool <- pool::dbPool(
-    drv = RPostgres::Postgres(), dbname = "test3",
-    host = "localhost", port = 5432,
-    user = ifelse(Sys.getenv("USR") == "", "nrm_msk", Sys.getenv("USR")),
-    password = ifelse(Sys.getenv("PWD") == "", askForPassword(), Sys.getenv("PWD"))
-  )
+  #  sebms_pool <<- sebms_connect()
+  #t <- try(config <- config::get("sebms", file = cfgfile))
+  #if (inherits(t, "try-error")) alternativeFunction()
+  cfgfile <- file.path(rappdirs::app_dir("sebms")$config(), "config.yml")
+  tryCatch(config <- config::get(NULL, "sebms", file = cfgfile), 
+    error = function(e) {
+      if (!dir.exists(dirname(cfgfile))) dir.create(dirname(cfgfile))
+      template <- system.file("extdata", "config.yml", package = "swedishbutterflies")
+      if (template != "") file.copy(template, cfgfile) else file.copy("extdata/config.yml", cfgfile, overwrite = TRUE)
+    }, finally = {
+      config <- config::get(NULL, "sebms", file = cfgfile)
+    })
+
+  tryCatch(
+    pool <- pool::dbPool(
+      drv = config$sebms$driver, 
+      dbname =config$sebms$database,
+      host = config$sebms$server, 
+      port = config$sebms$port,
+      user = config$sebms$dbuser,
+      password = config$sebms$dbpass), # some bug - uses present working dir instead of the password
+  error = function(e) {
+    warning("Got error, no connection established, start tunnels? Error:", e)
+    message("Config usr is: ", config$sebms$dbuser)
+    message("Config pwd is: ", config$sebms$dbpass)
+    pool <- NULL
+  })
+  
   return (pool)
 }
 

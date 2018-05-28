@@ -1,0 +1,9 @@
+default:
+  sebms:
+    driver: !expr RPostgres::Postgres() 
+    server: 'localhost'
+    dbuser: !expr Sys.getenv("DBUSER")
+    dbpass: !expr Sys.getenv("DBPASS")  
+    port: 5432
+    database: 'test3'
+

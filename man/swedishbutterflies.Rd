@@ -8,3 +8,4 @@
 \description{
 swedishbutterflies
 }
+\keyword{package}

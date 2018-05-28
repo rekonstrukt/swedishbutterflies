@@ -38,6 +38,11 @@ sebms_data_species_per_site_sitetype %>%
 head(5) %>%
 kable()
 
+# Naturum site locations
+sebms_data_sites_naturum %>%
+head(5) %>% 
+kable()
+
 
 ## ------------------------------------------------------------------------
 
@@ -54,11 +59,6 @@ head(5) %>%
 kable()
 
 sebms_species_per_year_site_counts_filtered() %>%
-head(5) %>% 
-kable()
-
-# Naturum site locations
-sebms_data_sites_naturum %>%
 head(5) %>% 
 kable()
   
