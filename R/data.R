@@ -16,7 +16,9 @@ sebms_connect <- function() {
     }, finally = {
       config <- config::get(NULL, "sebms", file = cfgfile)
     })
-
+  
+  pool <- NULL
+  
   tryCatch(
     pool <- pool::dbPool(
       drv = config$sebms$driver, 
@@ -26,13 +28,30 @@ sebms_connect <- function() {
       user = config$sebms$dbuser,
       password = config$sebms$dbpass), # some bug - uses present working dir instead of the password
   error = function(e) {
-    warning("Got error, no connection established, start tunnels? Error:", e)
-    message("Config usr is: ", config$sebms$dbuser)
-    message("Config pwd is: ", config$sebms$dbpass)
-    pool <- NULL
+    message("Got error connecting to SeBMS, did you start tunnels?")
+    #e$message <- paste("Error connecting to SeBMS ", e, sep = " ")
+    #warning(e)
+    message("Config dbuser is: ", config$sebms$dbuser, " at time ", Sys.time())
   })
   
   return (pool)
+}
+
+#' Connection pool used for db connections
+#' @noMd
+#sebms_pool <<- sebms_connect()
+
+sebms_assert_connection <- function(pool) {
+  if (!missing(pool)) return(pool)
+  if (is.null(sebms_pool)) {
+    message("Attempting reconnect to db...")
+    if (exists("sebms_pool")) rm("sebms_pool")
+    sebms_pool <<- sebms_connect()
+    if (is.null(sebms_pool))
+      warning("No connection. Please check connection settings in config.yml...")
+    else
+      message("Connected!")
+  }
 }
 
 #' Get user data
@@ -40,7 +59,9 @@ sebms_connect <- function() {
 #' @import dplyr
 #' @export
 sebms_users <- function(my_username = NULL) {
-  
+
+  sebms_assert_connection()
+    
   res <- 
     tbl(sebms_pool, "usr_user") %>%
     select_all(funs(gsub("usr_", "", .))) %>%
@@ -62,6 +83,8 @@ sebms_users <- function(my_username = NULL) {
 #' @importFrom DBI dbSendQuery dbClearResult
 #' @export
 sebms_per_update_modified <- function(my_uid) {
+
+  sebms_assert_connection()
   
   s <- "UPDATE per_person 
     SET per_modifiedtime = CURRENT_TIMESTAMP, 
@@ -80,7 +103,7 @@ sebms_per_update_modified <- function(my_uid) {
 #' @importFrom DBI dbGetQuery
 #' @export
 sebms_species_per_year <- function() {
-
+  
   q <- "
     SELECT
       spe.spe_uid AS id,
@@ -103,6 +126,7 @@ sebms_species_per_year <- function() {
     ORDER BY
     count DESC;"
   
+  sebms_assert_connection()
   res <- DBI::dbGetQuery(sebms_pool, q)
   as_tibble(res)
 }
@@ -134,6 +158,7 @@ GROUP BY
 ORDER BY
 count DESC;"
   
+  sebms_assert_connection()
   res <- dbGetQuery(sebms_pool, q)
   as_tibble(res)
   
@@ -165,6 +190,8 @@ GROUP BY
   sit.sit_uid
 ORDER BY
 species DESC;"
+
+  sebms_assert_connection()
   res <- dbGetQuery(sebms_pool, q)
   as_tibble(res)
 }
@@ -198,13 +225,15 @@ GROUP BY
 ORDER BY
 id , speciesno DESC;"
   
+  sebms_assert_connection()
   res <- dbGetQuery(sebms_pool, q)
   as_tibble(res)
 }
 
 #' Climate data for Naturum sites from SMHI
 #' @return data frame with climate data
-#' @import purrr 
+#' @import purrr
+#' @import dplyr
 #' @import tidyr 
 #' @import tibble 
 #' @importFrom lubridate ymd_hms
@@ -234,7 +263,7 @@ sebms_naturum_climate <- function() {
     res <- 
       df %>% 
       mutate(date = ymd_hms(id)) %>%
-      select(date, name, values) %>%
+      dplyr::select(date, name, values) %>%
       spread(name, values) %>%
       mutate(is_gogogo = t >= 13 & ws < 7.9 & tcc_mean <= 4 & pmean == 0)
     

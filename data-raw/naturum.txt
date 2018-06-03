@@ -1,0 +1,34 @@
+"Namn","Lat","Long"
+"Naturum Abisko", 68.35812, 18.78484
+"Naturum Blekinge",56.19732,15.28689
+"Naturum Dalarna",60.78969,14.85332
+"Naturum Falsterbo",55.39293,12.85057
+"Naturum Fjärås Bräcka",57.44603,12.18500
+"Naturum Fulufjället",61.63625,12.71542
+"Naturum Färnebofjärden",60.28681,16.88165
+"Naturum Getterön",57.12648,12.25242
+"Naturum Gotland",56.96870,18.23067
+"Naturum Hornborgasjön",58.32409,13.58692
+"Naturum Höga Kusten",63.07210,18.35773
+"Naturum Kosterhavet",58.89304,11.04784
+"Naturum Kronoberg",56.77865,14.59353
+"Naturum Kullaberg",56.30128,12.45202
+"Naturum Laponia",67.475843,18.351839
+"Naturum Nationalparkernas hus",59.16885,18.23662
+"Naturum Ottenby",56.19647,16.39900
+"Naturum Skrylle",55.69212,13.36073
+"Naturum Sommen",58.02911,15.08902
+"Naturum Stendörren",58.74575,17.39262
+"Naturum Stenshuvud",55.65619,14.26871
+"Naturum Store Mosse",57.29942,13.93273
+"Naturum Söderåsen",56.03880,13.25154
+"Naturum Trollskogen",57.342800,17.119204 
+"Naturum Tåkern",58.33263,14.82180
+"Naturum Vattenriket",56.02855,14.14719
+"Naturum Vindelfjällen Ammarnäs",65.95729,16.20524
+"Naturum Vindelfjällen Hemavan",65.81530,15.10447
+"Naturum Vålådalen",63.14827,12.96464
+"Naturum Vänerskärgården",58.67229,13.21676
+"Naturum Värmland",59.367015,13.486451
+"Naturum Västervik",57.76619,16.64400
+"Naturum Ånge",62.53671,15.91903

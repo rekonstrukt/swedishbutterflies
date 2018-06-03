@@ -1,0 +1,32 @@
+language: R
+cache: packages
+r: release
+repos:
+  CRAN: https://cloud.r-project.org
+  ropensci: http://packages.ropensci.org
+warnings_are_errors: false
+env:
+  global:
+  - R_PKG="$(basename $TRAVIS_REPO_SLUG)"
+addons:
+  apt:
+    packages:
+    - r-base-dev
+    - r-recommended
+    - libxml2-dev
+before_install:
+- tlmgr install index
+before_deploy:
+- echo "Tags are deployed to GitHub Releases for $R_PKG"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: PeglL2ArB95UWARuZ2f/IJoNjRyqMFAVx37y2F3ybz8tI4+nRgyabKAUXaTOnzVpGqXpp1UKPtYg1QKiTYEntee+htD0QkeBNBzWFzN1OVTfEMdhrC4wZSMLaEmhXPKlhDS0WQLfxv4516Y8ffG3Ewj7gFgmo3QoInzFBH0jiKli3iui5nIIZyQWqq9nfmjUMGkEp7F10PxgbzYY8TxU4xevfpF9r9ijQspCFfeyVxKmi2LverquF97EayFIlx90OXDFbkNKXgNjcBfxPuezP4zRsnEK1F/kTrovbqFxOKVwzj+Y0ggk0iu/l2eIJ7Cvw1m9AcnzGK2OFgIAWgzWBTXWeFBNG6Ipo6Kfj6LSqZgA0urAk52xhwXpvvTVMg6OP9LnZrtjQ9vHIg27zCIiOvoKedYp3aJzUwWO/ijFOKp9RXu9rDtS7O49PsZB0QvRPhNxcw/hu2xr3+xcZ3n+vEw7BiltLl13TKE/WGsyZ+83mwPUq/SPYXohav3uQOA+R/8LhWDeDILTiuJtGDAUcb170gpOIbamVKGIXdx6fxJ2l9SInwwvcRmHpiNHASciueFumAn8lTuBKO7pqaruRBO3mkOG5tM8Oa/1XqY1R2uNU1xGfDtNSFYtMRt3Cmbialy6QPxuXbjf0hU7ICytzKzUuJ/3bYEJ5bRCu5wzrf0=
+  file_glob: true
+  file: ! "${R_PKG}_*.tar.gz"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    repo: rekonstrukt/swedishbutterflies
+    tags: true

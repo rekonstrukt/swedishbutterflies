@@ -33,3 +33,4 @@ test_that("naturum climate data works", {
   df <- sebms_naturum_climate()
   expect_gt(nrow(df), 0)
 })
+

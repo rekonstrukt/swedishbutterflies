@@ -306,7 +306,7 @@ sebms_species_per_site_sitetype_plot <- function() {
     group_by(interval, sortorder, sitetype) %>%
     summarize(site_count = n_distinct(id)) %>%
     arrange(-desc(sortorder)) %>%
-    select(interval, sortorder, sitetype, site_count)
+    dplyr::select(interval, sortorder, sitetype, site_count)
 
   col_palette <- sebms_palette
   

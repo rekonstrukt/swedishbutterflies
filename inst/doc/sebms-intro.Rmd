@@ -1,5 +1,5 @@
 ---
-title: "Using swedishbutterflies - tools for Swedish Butterflies Monitoring"
+title: "Using swedishbutterflies - tools from SeBMS"
 author: "Markus Skyttner"
 date: "`r Sys.Date()`"
 output: 
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 ## Using "swedishbutterflies"
 
-The R-package "swedishbutterflies" contains functions for retrieving data from the Swedish Butterfly Monitoring Scheme's (aka SeBMS) database, for generating static figures and a Shiny proof-of-concept app.
+The R-package "swedishbutterflies" contains functions for retrieving data from SeBMS - the Swedish Butterfly Monitoring Scheme's database. It can be used for accessing data, for generating static figures and for using an included Shiny proof-of-concept app.
 
 ### Retrieving data
 
@@ -60,6 +60,11 @@ sebms_data_species_per_site_sitetype %>%
 head(5) %>%
 kable()
 
+# Naturum site locations
+sebms_data_sites_naturum %>%
+head(5) %>% 
+kable()
+
 ```
 
 There are also functions for retrieving data from the database:
@@ -79,11 +84,6 @@ head(5) %>%
 kable()
 
 sebms_species_per_year_site_counts_filtered() %>%
-head(5) %>% 
-kable()
-
-# Naturum site locations
-sebms_data_sites_naturum %>%
 head(5) %>% 
 kable()
   
@@ -164,12 +164,80 @@ Show some climate data for Naturum sites where butterflies might currently be ob
 
 ```{r}
 
-gogogo <- 
+gogogo <-
   sebms_naturum_climate() %>%
   filter(is_gogogo) %>%
-  select(id, is_gogogo, t, ws, tcc_mean, pmean, date)
+  dplyr::select(id, is_gogogo, t, ws, tcc_mean, pmean, date)
 
 gogogo %>% head(5) %>% kable
+
+```
+
+## Spatial data and plots
+
+There is also spatial data and functions for plotting included.
+
+For example, data for sunhours is provided as a raster brick and can be plotted using ggplot or leaflet:
+
+```{r}
+
+# spatial data - a raster brick with sunhour layers
+smhi_sunhours_rb
+
+sun <- smhi_sunhours_rb$period_means
+
+# plot spatial data
+sebms_sunhours_plot(rl = sun) %>%
+  sebms_ggsave(filename = "/tmp/plot-01.png")
+
+image_read("/tmp/plot-01.png")
+
+```
+
+```{r}
+sebms_sunhours_plot(show_legend = TRUE) %>%
+  sebms_ggsave(filename = "/tmp/plot-02.png")
+
+image_read("/tmp/plot-02.png")
+
+```
+
+
+The leaflet map can also be used with the SMHI sunhours data:
+
+```{r, fig.width=7}
+
+library(leaflet)
+
+  sebms_sunhours_leaflet(rl = smhi_sunhours_rb$diff_latest, 
+   options = leafletOptions(zoomControl = TRUE)) %>%
+  addProviderTiles("Stamen.Watercolor",
+    options = providerTileOptions(opacity = 0.25))
+
+```
+
+Some spatial data for Swedish geography is included - polygons in `sebms_swe_borders` and a grid in `sebms_swe_grid`. These resources is used in a function that allows plotting of SeBMS locations/site data:
+
+```{r}
+
+library(sp)
+
+occ_sp <- SpatialPoints(coords = sebms_data_sites, 
+  proj4string = CRS("+proj=tmerc +lat_0=0 +lon_0=15.80827777777778 +k=1 +x_0=1500000 +y_0=0 +ellps=bessel +units=m +no_defs"))
+  
+#df <- sebms_data_sites %>% dplyr::filter(`coords.x1` > 1380000)
+
+# plot distribution of sites
+sebms_species_site_plot(occ_sp)$plot %>% image_resize("x500")
+
+```
+The legend is available separately, if needed:
+
+```{r}
+
+# display a legend for the colors
+sebms_species_site_plot(occ_sp)$legend %>%
+  image_trim()
 
 ```
 
