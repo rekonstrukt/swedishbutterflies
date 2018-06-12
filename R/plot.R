@@ -130,7 +130,6 @@ sebms_temp_plot <- function(my_place) {
 #' @importFrom purrr map map2
 #' @importFrom magick image_append image_read
 #' @export
-#' 
 sebms_precip_temp_2015_plot <- function() {
 
   cities <- c("Umeå", "Stockholm", "Visby", "Lund")

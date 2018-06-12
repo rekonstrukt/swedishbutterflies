@@ -107,7 +107,10 @@ df <-
   as_tibble() %>% 
   setNames(sites$province)
 
-datatable(df)
+datatable(df, options = list(
+  autoWidth = TRUE,
+  scrollX = TRUE
+))
 
 
 ## ------------------------------------------------------------------------

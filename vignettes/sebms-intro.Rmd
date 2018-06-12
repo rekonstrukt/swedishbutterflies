@@ -19,11 +19,11 @@ knitr::opts_chunk$set(
 
 ```
 
-## Using "swedishbutterflies"
+# Using "swedishbutterflies"
 
 The R-package "swedishbutterflies" contains functions for retrieving data from SeBMS - the Swedish Butterfly Monitoring Scheme's database. It can be used for accessing data, for generating static figures and for using an included Shiny proof-of-concept app.
 
-### Retrieving data
+## Retrieving off-line data
 
 Some data is bundled into the package, for example:
 
@@ -67,7 +67,11 @@ kable()
 
 ```
 
-There are also functions for retrieving data from the database:
+## Retrieving on-line data
+
+There are also functions for retrieving data from the database. These will fail if the db connection is not available. 
+
+Example usage:
 
 ```{r}
 
@@ -89,9 +93,11 @@ kable()
   
 ```
 
-### Generating figures
+## Plotting figures
 
-The figures can be included in an annual report, for example this figure with temperature and precipitation data for 2015.
+The figures can be included in an annual report.
+
+Here is an example plotting a figure with temperature and precipitation data for 2015.
 
 ```{r, message=FALSE, fig.show='hold', fig.cap='Temperature and Precipitation for 2015', fig.width=7}
 
@@ -156,7 +162,10 @@ df <-
   as_tibble() %>% 
   setNames(sites$province)
 
-datatable(df)
+datatable(df, options = list(
+  autoWidth = TRUE,
+  scrollX = TRUE
+))
 
 ```
 
