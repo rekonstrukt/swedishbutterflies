@@ -10,9 +10,14 @@ sebms_connect <- function() {
   cfgfile <- file.path(rappdirs::app_dir("sebms")$config(), "config.yml")
   tryCatch(config <- config::get(NULL, "sebms", file = cfgfile), 
     error = function(e) {
-      if (!dir.exists(dirname(cfgfile))) dir.create(dirname(cfgfile))
-      template <- system.file("extdata", "config.yml", package = "swedishbutterflies")
-      if (template != "") file.copy(template, cfgfile) else file.copy("extdata/config.yml", cfgfile, overwrite = TRUE)
+      if (!dir.exists(dirname(cfgfile))) 
+        dir.create(dirname(cfgfile), recursive = TRUE)
+      template <- 
+        system.file("extdata", "config.yml", package = "swedishbutterflies")
+      if (template != "") 
+        file.copy(template, cfgfile) 
+      else 
+        file.copy("extdata/config.yml", cfgfile, overwrite = TRUE)
     }, finally = {
       config <- config::get(NULL, "sebms", file = cfgfile)
     })
@@ -28,7 +33,7 @@ sebms_connect <- function() {
       user = config$sebms$dbuser,
       password = config$sebms$dbpass), # some bug - uses present working dir instead of the password
   error = function(e) {
-    message("Got error connecting to SeBMS, did you start tunnels?")
+    message("Cannot connect to SeBMS db, need ssh tunnel?")
     #e$message <- paste("Error connecting to SeBMS ", e, sep = " ")
     #warning(e)
     message("Config dbuser is: ", config$sebms$dbuser, " at time ", Sys.time())
@@ -43,14 +48,22 @@ sebms_connect <- function() {
 
 sebms_assert_connection <- function(pool) {
   if (!missing(pool)) return(pool)
-  if (is.null(sebms_pool)) {
-    message("Attempting reconnect to db...")
-    if (exists("sebms_pool")) rm("sebms_pool")
-    sebms_pool <<- sebms_connect()
-    if (is.null(sebms_pool))
-      warning("No connection. Please check connection settings in config.yml...")
-    else
-      message("Connected!")
+  if (exists("sebms_pool")) {
+    sebms_pool <- base::get("sebms_pool")
+    if (is.null(sebms_pool)) {
+      message("Removing nullified SeBMS connection pool...")
+      rm(sebms_pool)
+    } else if (DBI::dbGetInfo(sebms_pool)$valid) {
+      message("Using existing connection")
+      return (TRUE)
+    }
+  }
+  message("Attempting reconnect to db...")
+  sebms_pool <<- sebms_connect()
+  if (!DBI::dbGetInfo(sebms_pool)$valid) {
+    warning("Invalid connection. Please check connection settings in .config.yml... ", DBI::dbGetInfo(sebms_pool))
+  } else {
+    message("Connected!")
   }
 }
 
@@ -92,7 +105,7 @@ sebms_per_update_modified <- function(my_uid) {
   
   poolWithTransaction(sebms_pool, function(conn) {
     res <- dbSendQuery(conn, s, params = list(my_uid))
-    DBI::dbClearResult(res)
+    dbClearResult(res)
   })
   
 }
@@ -127,7 +140,7 @@ sebms_species_per_year <- function() {
     count DESC;"
   
   sebms_assert_connection()
-  res <- DBI::dbGetQuery(sebms_pool, q)
+  res <- dbGetQuery(sebms_pool, q)
   as_tibble(res)
 }
  
