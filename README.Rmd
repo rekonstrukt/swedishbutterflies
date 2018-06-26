@@ -58,7 +58,7 @@ After this, the tunnel can be established with the command `ssh -N butterflies`.
 
 ### Config for db connection
 
-Once the datbase server is available, the R package needs to be configured to use the database connection. To achieve this, load the package in your R environment and create a `config.yml` with the db connection details and perhaps also a `.Renviron` file, if you have a config file that references environment variables in R:
+Once the database server is available, the R package needs to be configured to use the database connection. To achieve this, load the package in your R environment and create a `config.yml` with the db connection details and perhaps also a `.Renviron` file, if you have a config file that references environment variables in R:
 
 ```{r message=FALSE, warning=FALSE, eval=FALSE}
 
@@ -66,7 +66,9 @@ library(swedishbutterflies)
 library(rappdirs)
 
 # this is the location for config.yml holding db connection details
-app_dir("sebms")$config()
+app_dir("sebms")$config() 
+# the location may vary depending on OS
+# on a Linux OS a valid value is the directory $HOME/.config/sebms
 
 # this is the location for .Renviron (if used on Windows 7)
 Sys.getenv("R_USER")
@@ -96,7 +98,7 @@ content <- readLines(system.file("extdata", "config.yml",
 cat(paste(content, collapse = "\n"))
 ```
 
-For the above connection to be initiated, you also need to set up your `.Renviron` with that content:
+For the above connection to be initiated, you also need to set up your `.Renviron` with the environment variables containing the credentials:
 
 ```console
 DBUSER = my_db_username

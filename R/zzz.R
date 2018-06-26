@@ -28,15 +28,18 @@ Use runShinyApp('poc') to run the Shiny proof-of-concept app"
   #poolReturn(conn)  
   #}
   sebms_pool <<- swedishbutterflies:::sebms_connect()
-  if (is.null(sebms_pool)) 
-    message("Please enable db connections (run tunnels?)")
+  if (is.null(sebms_pool)) {
+    message("Please enable db connections for full functionality")
+    message("(edit settings in config.yml and/or run ssh tunnels?)")
+  }
 }
 
 .onDetach <- function(libpath) {
   if (base::exists("sebms_pool")) {
     message("Closing sebms connection pool")
     pool::poolClose(sebms_pool)
-    rm(base::get("sebms_pool"))
+    #rm(list = c("sebms_pool"), inherits = TRUE)
+    rm(sebms_pool)
   }
 }
 
