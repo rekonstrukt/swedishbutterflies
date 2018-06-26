@@ -49,10 +49,13 @@ sebms_palette <- c("#9BBB59", "#C0504D")
 #' Plot precipitation for 2015
 #' @import ggplot2
 #' @noRd
-sebms_precip_plot <- function(my_place) {
+sebms_precip_plot <- function(my_place, df) {
+  
+  if (missing(df))
+    df <- sebms_data_precip_2015
   
   nb <- 
-    sebms_data_precip_2015 %>% 
+    df %>% 
     filter(place == my_place) %>%
     arrange(month, period.name)
   
@@ -81,13 +84,16 @@ sebms_precip_plot <- function(my_place) {
   return (g)
 }
 
-#' Plot temperatures for 2015
+#' Plot temperatures
 #' @import ggplot2
 #' @noRd
-sebms_temp_plot <- function(my_place) {
+sebms_temp_plot <- function(my_place, df) {
+  
+  if (missing(df))
+    df <- sebms_data_temp_2015
   
   temp <- 
-    sebms_data_temp_2015 %>% 
+    df %>% 
     filter(place == my_place) %>% 
     rename(Period = period.name)
   
@@ -131,9 +137,30 @@ sebms_temp_plot <- function(my_place) {
 #' @importFrom magick image_append image_read
 #' @export
 sebms_precip_temp_2015_plot <- function() {
+  sebms_precip_temp_plot()
+}
 
-  cities <- c("Umeå", "Stockholm", "Visby", "Lund")
+#' Plot of temperature and precipitation data
+#' 
+#' @param filter_cities a vector of cities, if missing a default of c("Umeå", "Stockholm", "Visby", "Lund") is used
+#' @param df_precip a data frame with precipitation data in a specific format, see vignette for details, default uses packaged data sebms_data_precip_2015
+#' @param df_temp a data frame with temperature data in a the same format, see vignette for details, default uses packaged data sebms_data_temp_2015
+#' @return a ggplot plot object
+#' @import ggplot2
+#' @importFrom purrr map map2
+#' @importFrom magick image_append image_read
+#' @export
+sebms_precip_temp_plot <- function(filter_cities, df_precip, df_temp) {
+  
+  if (missing(filter_cities))
+    filter_cities <- c("Umeå", "Stockholm", "Visby", "Lund")
 
+  if (missing(df_precip))
+    df_precip <- sebms_data_precip_2015
+  
+  if (missing(df_temp))
+    df_temp <- sebms_data_temp_2015
+  
   save_pplot <- function(g, fn, w = 5, h = 3.5) {
     ggsave(
       filename = fn, 
@@ -141,18 +168,18 @@ sebms_precip_temp_2015_plot <- function() {
       width = w, height = h)
   }
   
-  pplots <- map(cities, sebms_precip_plot)
-  map2(pplots, paste0("/tmp/precip-", cities), save_pplot)
+  pplots <- map(filter_cities, function(x) sebms_precip_plot(x, df = df_precip))
+  map2(pplots, paste0("/tmp/precip-", filter_cities), save_pplot)
   
-  tplots <- map(cities, sebms_temp_plot)
-  map2(tplots, paste0("/tmp/temp-", cities), save_pplot)
+  tplots <- map(filter_cities, function(x) sebms_temp_plot(x, df = df_temp))
+  map2(tplots, paste0("/tmp/temp-", filter_cities), save_pplot)
   
   stack_right <- image_append(stack = TRUE,
-    image_read(paste0("/tmp/precip-", cities))
+    image_read(paste0("/tmp/precip-", filter_cities))
   )
   
   stack_left <- image_append(stack = TRUE,
-    image_read(paste0("/tmp/temp-", cities))
+    image_read(paste0("/tmp/temp-", filter_cities))
   )
   
   stack <- image_append(c(
@@ -275,7 +302,7 @@ sebms_species_histo_plot <- function() {
     labels = c("april", "maj", "juni", "juli", "augusti", "september", "oktober"),
     limits = c(12, 42), expand = c(0, 0), 
     sec.axis = sec_axis( ~ ., breaks = c(12:42), 
-      labels = c("", paste0("v", c(13:41)), ""))) +
+      labels = c("", paste0("", c(13:41)), ""))) +
   theme_sebms() +
   theme(panel.grid.major.y = element_line(color = "gray"),
         panel.grid.minor.x = element_line(color = "gray"),
@@ -286,6 +313,72 @@ sebms_species_histo_plot <- function() {
   
   return (p)
 }
+
+#' Species histo plot - original version
+#' 
+#' This plot should probably be parameterized with the week range (defaulted to 13..42) used for the x-axis and with the relevant year context, also the range of y-axis should not be hardcoded in the future.
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom lubridate month weeks ymd
+#' @export
+#' 
+sebms_species_histo_plot_orig <- function() {
+
+  df <- 
+    sebms_data_species_histo %>%
+    group_by(artnamn, vecka) %>%
+    summarise(count = sum(sumval))
+  
+  #df$count <- as.integer(floor(runif(7, 0, 10)))
+  
+  col_palette <- sebms_palette
+  
+  fmt_label <- function(w) {
+    
+    se_months <- c(
+      "januari", "februari", "mars",
+      "april", "maj", "juni",
+      "juli","augusti", "september",
+      "oktober", "november", "december")
+    
+    if_else(is.na(lag(w)) | !month(ymd("2015-01-01") + weeks(lag(w))) == month(ymd("2015-01-01") + weeks(w)), 
+      paste0(sprintf("%2i", w), "\n", se_months[month(ymd("2015-01-01") + weeks(w))]), 
+      paste(w))
+  }
+  
+  p <- 
+    ggplot(data = df, 
+    aes(x = vecka, y = count)) +
+    geom_bar(stat = 'identity', color = col_palette[1], fill = col_palette[1], width = 0.5) +
+    xlab("") + ylab("") +
+    scale_y_continuous(limits = c(0, max(10, df$count)), expand = c(0, 0.6)) +
+    scale_x_continuous(
+      #minor_breaks = c(10, 13:42), 
+      #breaks = c(13, 18, 22, 26, 31, 35, 40),
+      breaks = c(10, 13:42),
+      labels = c("Vecka: ", fmt_label(13:42)),
+      limits = c(10, 43), 
+      expand = c(0, 0) 
+      #sec.axis = sec_axis( ~ ., breaks = c(12:42), labels = c("", paste0("v", c(13:41)), "")
+    ) + 
+    #annotate("text", x = 12, y = 0, label = "Vecka", size = 4) + 
+    theme_sebms() +
+    theme(panel.grid.major.y = element_line(color = "gray"),
+         # panel.grid.minor.x = element_line(color = "gray"),
+         # panel.grid.major.x = element_line(color = "gray40"),
+          axis.ticks.x = element_line(color = "gray5"),
+          axis.ticks.length = unit(0, "cm"),
+        #  axis.text.x = element_text(hjust = 0),
+          axis.line = element_line(color = "gray5"),
+          plot.title = element_text(hjust = 0.5))
+  
+  return (p)
+  # remove clipping of x axis labels
+  #g <- ggplot_gtable(ggplot_build(p))
+  #g$layout$clip[g$layout$name == "panel"] <- "off"
+  #grid::grid.draw(g)
+}
+
 
 #' Species per site and sitetype histo plot
 #' @import dplyr
