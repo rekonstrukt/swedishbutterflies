@@ -6,7 +6,19 @@ For more fine-grained list of changes or to report a bug, consult
 * [The issues log](https://github.com/rekonstrukt/swedishbutterflies/issues)
 * [The commit log](https://github.com/rekonstrukt/swedishbutterflies/commits/master)
 
+# v 0.1.2
 
+* Fixed default connection template file for config.yml to use "test5" database
+
+* Improved some log messages to make it clear that package installation succeeds even if there is no valid database connection
+
+* Added species histogram plot with original requested style similar to https://user-images.githubusercontent.com/19598308/41712519-02748db0-754b-11e8-8919-5c3d5b64dc66.png
+
+* Removed prefix "v" before week numbers in sebms_species_histo_plot()
+
+* Changed sebms_species_histo_plot_orig() plot for the value scale to achieve the minimal scale 0..10 and to allow tallest bars to roam freely upwards
+
+* Added docs for the new sebms_precip_temp_plot() function and added usage examples to the Vignette to show how to use that function to make a plot with custom data
 
 # v 0.1.1
 

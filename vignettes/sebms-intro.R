@@ -71,6 +71,46 @@ sebms_precip_temp_2015_plot() %>%
   image_resize("700x")
 
 
+## ---- message=FALSE, fig.show='hold', fig.cap='Temperature and Precipitation - minimal example', fig.width=7----
+
+test_precip <- tibble( # minimal example with 1 observation
+  place = "Lund", 
+  month = 4, month.name = "april", 
+  period = 2, period.name = "1961-1990", 
+  nb = 40
+)
+
+test_temp <- tibble(  # minimal example with 2 observations
+  place = "Lund", 
+  month = c(4, 5), month.name = c("april", "maj"),
+  period = 2, period.name = "1961-1990", 
+  temp = c(6.00, 11.5)
+)
+
+sebms_precip_temp_plot(filter_cities = c("Lund"), test_precip, test_temp) %>% 
+  image_resize("700x")
+
+
+## ---- message=FALSE, fig.show='hold', fig.cap='Temperature and Precipitation - another example', fig.width=7----
+
+test_precip2 <- 
+  sebms_data_precip_2015 %>% 
+  filter(place %in% c("Lund", "Stockholm"))
+
+test_temp2 <- 
+  sebms_data_temp_2015 %>% 
+  filter(place %in% c("Lund", "Stockholm"))
+
+plot <- 
+  sebms_precip_temp_plot(
+    filter_cities = c("Lund", "Stockholm"), 
+    df_precip = test_precip2, 
+    df_temp = test_temp2
+  ) 
+
+plot %>% image_resize("700x")
+
+
 ## ------------------------------------------------------------------------
 plots <- sebms_specieslist_cum_plots()
 
@@ -88,6 +128,9 @@ p2
 p1 %>% sebms_ggsave(661, 812, filename = "/tmp/specieslist-01.png")
 p2 %>% sebms_ggsave(666, 900, filename = "/tmp/specieslist-02.png")
 
+
+## ---- fig.width=7--------------------------------------------------------
+sebms_species_histo_plot_orig()
 
 ## ---- fig.width=7--------------------------------------------------------
 sebms_species_histo_plot()
