@@ -39,7 +39,7 @@ After this, the tunnel can be established with the command `ssh -N butterflies`.
 
 ### Config for db connection
 
-Once the datbase server is available, the R package needs to be configured to use the database connection. To achieve this, load the package in your R environment and create a `config.yml` with the db connection details and perhaps also a `.Renviron` file, if you have a config file that references environment variables in R:
+Once the database server is available, the R package needs to be configured to use the database connection. To achieve this, load the package in your R environment and create a `config.yml` with the db connection details and perhaps also a `.Renviron` file, if you have a config file that references environment variables in R:
 
 ``` r
 
@@ -47,10 +47,15 @@ library(swedishbutterflies)
 library(rappdirs)
 
 # this is the location for config.yml holding db connection details
-app_dir("sebms")$config()
+app_dir("sebms")$config() 
+# the location may vary depending on OS
+# on a Linux OS a valid path for the file is $HOME/.config/sebms/config.yml
+# on a Windows 8 OS a valid path for the file is C:\Users\IEUser\AppData\Local\sebms\sebms\config.yml
 
-# this is the location for .Renviron (if used on Windows 7)
+# this is the location for .Renviron
 Sys.getenv("R_USER")
+# on a Linux OS a valid path for the .Renviron file is $HOME ie ~/.Renviron
+# on a Windows 8 OS a valid path for the .Renviron file is C:\Users\IEUser\.Renviron
 ```
 
 Example content that can be used in the `config.yml`:
@@ -66,7 +71,7 @@ default:
     database: 'test4'
 ```
 
-If you prefer to use environment variables and reference those in the `config.yml`, the file can look like this:
+If you prefer to use environment variables for the credentials and reference those in the `config.yml`, the file can look like this:
 
     default:
       sebms:
@@ -75,9 +80,9 @@ If you prefer to use environment variables and reference those in the `config.ym
         dbuser: !expr Sys.getenv("DBUSER")
         dbpass: !expr Sys.getenv("DBPASS")  
         port: 5432
-        database: 'test4'
+        database: 'test5'
 
-For the above connection to be initiated, you also need to set up your `.Renviron` with that content:
+For the above connection to be initiated, you also need to set up your `.Renviron` with the environment variables containing the credentials:
 
 ``` console
 DBUSER = my_db_username
@@ -94,7 +99,9 @@ Please read the Vignette, using either the Help tab in RStudio IDE or the R prom
 Development
 -----------
 
-To further develop or change the package, please refer to instructions at <http://r-pkgs.had.co.nz/>, then fork this repo and submit a PR with the changes. For a concrete example - to make a change with regards to how the filtering on species and year dimensions works for the species data, edit the 'R/data.R' file for example by adjusting the query used in the sebms\_species\_per\_year function, and possibly adding a test in `test/testthat/test-sebms-various.R` that verifies expected results, then do the Ctrl+Shift+{D,T,E} steps and then use git to commit and push the changes.
+To further develop or change the package, please refer to instructions at <http://r-pkgs.had.co.nz/>, then fork this repo and submit a PR with the changes.
+
+For a concrete example - to make a change with regards to how the filtering on species and year dimensions works for the species data, edit the 'R/data.R' file for example by adjusting the query used in the sebms\_species\_per\_year function, and possibly adding a test in `test/testthat/test-sebms-various.R` that verifies expected results, then do the Ctrl+Shift+{D,T,E} steps and then use git to commit and push the changes.
 
 To change functions that retrieve data from the db, please make changes primarily in the `R/data.R` file.
 
