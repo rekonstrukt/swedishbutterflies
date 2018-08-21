@@ -173,11 +173,11 @@ sebms_precip_temp_plot <- function(filter_cities, df_precip, df_temp) {
       paste0(prefix, basename(tempfile(fileext = ".png"))))
   }
 
-  fn_temp <- tempfile_png("precip-")
+  fn_temp <- map_chr(rep("precip-", length(filter_cities)), tempfile_png)
   pplots <- map(filter_cities, function(x) sebms_precip_plot(x, df = df_precip))
   map2(pplots, fn_temp, save_pplot)
   
-  fn_precip <- tempfile_png("precip-")
+  fn_precip <- map_chr(rep("temp-", length(filter_cities)), tempfile_png)
   tplots <- map(filter_cities, function(x) sebms_temp_plot(x, df = df_temp))
   map2(tplots, fn_precip, save_pplot)
   
