@@ -75,6 +75,7 @@ app_dir("sebms")$config()
 Sys.getenv("R_USER")
 # on a Linux OS a valid path for the .Renviron file is $HOME ie ~/.Renviron
 # on a Windows 8 OS a valid path for the .Renviron file is C:\Users\IEUser\.Renviron
+# on a Windows 10 OS a valid path for the .Renviron file is C:\Users\IEUser\Documents\.Renviron
 
 ```
 

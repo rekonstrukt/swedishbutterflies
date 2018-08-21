@@ -168,24 +168,28 @@ sebms_precip_temp_plot <- function(filter_cities, df_precip, df_temp) {
       width = w, height = h)
   }
   
+  tempfile_png <- function(prefix) {
+    file.path(dirname(tempdir()), 
+      paste0(prefix, basename(tempfile(fileext = ".png"))))
+  }
+
+  fn_temp <- tempfile_png("precip-")
   pplots <- map(filter_cities, function(x) sebms_precip_plot(x, df = df_precip))
-  map2(pplots, paste0("/tmp/precip-", filter_cities), save_pplot)
+  map2(pplots, fn_temp, save_pplot)
   
+  fn_precip <- tempfile_png("precip-")
   tplots <- map(filter_cities, function(x) sebms_temp_plot(x, df = df_temp))
-  map2(tplots, paste0("/tmp/temp-", filter_cities), save_pplot)
+  map2(tplots, fn_precip, save_pplot)
   
-  stack_right <- image_append(stack = TRUE,
-    image_read(paste0("/tmp/precip-", filter_cities))
-  )
-  
-  stack_left <- image_append(stack = TRUE,
-    image_read(paste0("/tmp/temp-", filter_cities))
-  )
+  stack_right <- image_append(stack = TRUE, image_read(fn_precip))
+  stack_left <- image_append(stack = TRUE, image_read(fn_temp))
   
   stack <- image_append(c(
     stack_left,
     stack_right
   ))
+  
+  unlink(c(fn_temp, fn_precip))
   
   stack
   

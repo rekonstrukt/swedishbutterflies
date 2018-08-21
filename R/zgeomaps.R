@@ -107,20 +107,26 @@ sebms_species_site_plot <- function(occ_sp,
       plot = g, device = "png", 
       width = w, height = h)
   }
-    
-  layer1 %>% sebms_ggsave(filename = "/tmp/01.png")
-  p %>% sebms_ggsave(filename = "/tmp/02.png")
+  
+  fn1 <- tempfile("01-", fileext = ".png")
+  fn2 <- tempfile("02-", fileext = ".png")
+  fn3 <- tempfile("03-", fileext = ".png")
+  
+  layer1 %>% sebms_ggsave(filename = fn1)
+  p %>% sebms_ggsave(filename = fn2)
   
   l_plot <- cowplot::ggdraw() + cowplot::draw_grob(legend) 
-  l_plot %>% sebms_ggsave(filename = "/tmp/03.png")
+  l_plot %>% sebms_ggsave(filename = fn3)
   
-  i1 <- image_read("/tmp/01.png")%>% image_transparent("white")
-  i2 <- image_read("/tmp/02.png") %>% image_transparent("white")
-  i3 <- image_read("/tmp/03.png") %>% image_transparent("white")
+  i1 <- image_read(fn1)%>% image_transparent("white")
+  i2 <- image_read(fn2) %>% image_transparent("white")
+  i3 <- image_read(fn3) %>% image_transparent("white")
   i <- image_composite(i1, i2, operator = "Over") %>% image_trim()
   legend <- i3 %>% image_trim()
   
-  list(plot = i, legend = legend)
+  res <- list(plot = i, legend = legend)
+  unlink(c(fn1, fn2, fn3))
+  return (res)
 }
 
 #' Plot of sunhours using Leaflet

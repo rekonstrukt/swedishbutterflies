@@ -3,3 +3,4 @@
 ^data-raw$
 ^\.Renviron$
 ^README\.Rmd$
+^\.travis\.yml

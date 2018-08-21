@@ -125,8 +125,8 @@ p2
 
 ## ------------------------------------------------------------------------
 
-p1 %>% sebms_ggsave(661, 812, filename = "/tmp/specieslist-01.png")
-p2 %>% sebms_ggsave(666, 900, filename = "/tmp/specieslist-02.png")
+p1 %>% sebms_ggsave(661, 812, filename = tempfile("specieslist-01", fileext = ".png"))
+p2 %>% sebms_ggsave(666, 900, filename = tempfile("specieslist-02", fileext = ".png"))
 
 
 ## ---- fig.width=7--------------------------------------------------------
@@ -174,18 +174,23 @@ smhi_sunhours_rb
 sun <- smhi_sunhours_rb$period_means
 
 # plot spatial data
+fn_sun <- tempfile("plot-01", fileext = ".png")
 sebms_sunhours_plot(rl = sun) %>%
-  sebms_ggsave(filename = "/tmp/plot-01.png")
+  sebms_ggsave(filename = fn_sun)
 
-image_read("/tmp/plot-01.png")
+img <- image_read(fn_sun)
+unlink(fn_sun)
+img
 
 
 ## ------------------------------------------------------------------------
+fn_sun <- tempfile("plot-02", fileext = ".png")
 sebms_sunhours_plot(show_legend = TRUE) %>%
-  sebms_ggsave(filename = "/tmp/plot-02.png")
+  sebms_ggsave(filename = fn_sun)
 
-image_read("/tmp/plot-02.png")
-
+img <- image_read(fn_sun)
+unlink(fn_sun)
+img
 
 ## ---- fig.width=7--------------------------------------------------------
 

@@ -6,6 +6,10 @@ For more fine-grained list of changes or to report a bug, consult
 * [The issues log](https://github.com/rekonstrukt/swedishbutterflies/issues)
 * [The commit log](https://github.com/rekonstrukt/swedishbutterflies/commits/master)
 
+# v 0.1.3
+
+* Fixed issues with path separators not being platform independent therefore causing issues when using Windows 10.
+
 # v 0.1.2
 
 * Fixed default connection template file for config.yml to use "test5" database
