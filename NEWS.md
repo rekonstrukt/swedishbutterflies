@@ -6,6 +6,10 @@ For more fine-grained list of changes or to report a bug, consult
 * [The issues log](https://github.com/rekonstrukt/swedishbutterflies/issues)
 * [The commit log](https://github.com/rekonstrukt/swedishbutterflies/commits/master)
 
+# v 0.1.4
+
+* Fixed issue related to https://github.com/rekonstrukt/swedishbutterflies/issues/13 and (on Windows and OSX) this SO post: https://stackoverflow.com/questions/24495487/r-error-thrown-while-using-rgdal-and-raster-packages.
+
 # v 0.1.3
 
 * Fixed issues with path separators not being platform independent therefore causing issues when using Windows 10.

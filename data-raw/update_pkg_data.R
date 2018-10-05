@@ -447,7 +447,8 @@ sebms_data_sites <- as_tibble(as(alla, "SpatialPoints")@coords)
 use_data(sebms_data_sites, overwrite = TRUE)
 
 message("Saving Swedish TIFF raster")
-tiff <- raster::raster("data-raw/figures/MapDistribution-data/R_files_for_similar_map/MapSweden_modified.tif")
+# https://stackoverflow.com/questions/24495487/r-error-thrown-while-using-rgdal-and-raster-packages
+tiff <- raster::raster("data-raw/figures/MapDistribution-data/R_files_for_similar_map/MapSweden.tif")
 raster::crs(tiff) <-  sp::CRS("+proj=tmerc +lat_0=0 +lon_0=15.80827777777778 +k=1 +x_0=1500000 +y_0=0 +ellps=bessel +units=m +no_defs")
 sebms_data_swetiff <- tiff
 devtools::use_data(sebms_data_swetiff, overwrite = TRUE)

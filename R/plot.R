@@ -47,6 +47,7 @@ theme_sebms <- function(title_sz = 24,
 sebms_palette <- c("#9BBB59", "#C0504D")
 
 #' Plot precipitation for 2015
+#' @import dplyr
 #' @import ggplot2
 #' @noRd
 sebms_precip_plot <- function(my_place, df) {
@@ -85,6 +86,7 @@ sebms_precip_plot <- function(my_place, df) {
 }
 
 #' Plot temperatures
+#' @import dplyr
 #' @import ggplot2
 #' @noRd
 sebms_temp_plot <- function(my_place, df) {
