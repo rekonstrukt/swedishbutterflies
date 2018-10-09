@@ -8,7 +8,7 @@
 #' @import ggthemes
 #' @import ggplot2
 #' @importFrom rasterVis gplot
-#' @importFrom raster extent raster rasterize crs colortable projection values
+#' @importFrom raster extent raster rasterize crs crs<- colortable projection values
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom sp SpatialPixelsDataFrame spTransform
 #' @importFrom cowplot ggdraw draw_grob
@@ -50,9 +50,17 @@ sebms_species_site_plot <- function(occ_sp,
 #  tiff <- spTransform(tiff, crs(grid))
 #  tiff <- as.data.frame(tiff)
 #  colnames(tiff) <- c("value", "x", "y")
+
+  tiff <- raster(system.file("extdata", "MapSweden.tif", 
+    package = "swedishbutterflies", mustWork = TRUE))
   
+  raster::crs(tiff) <-  sp::CRS("+proj=tmerc +lat_0=0 +lon_0=15.80827777777778 +k=1 +x_0=1500000 +y_0=0 +ellps=bessel +units=m +no_defs")
+  
+  sebms_data_swetiff <- tiff
+
+    
   col_map <- function(rl) {
-    cm <- colortable(sebms_data_swetiff)
+    cm <- colortable(rl)
     names(cm) <- 0:(length(cm) - 1)
     cm
   }
@@ -60,7 +68,7 @@ sebms_species_site_plot <- function(occ_sp,
   layer1 <- 
     gplot(sebms_data_swetiff, maxpixels = 1e6) + 
     geom_raster(aes(x = x, y = y, fill = factor(value))) +
-    scale_fill_manual(values = col_map(a), guide = "none") +
+    scale_fill_manual(values = col_map(sebms_data_swetiff), guide = "none") +
     geom_polygon(data = bg, 
       aes(x = long, y = lat, group = group), 
       fill = NA, color = "transparent", size = 0.4) +
