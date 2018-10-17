@@ -5,10 +5,12 @@
 \title{Update person data in database - setting new modified time and
 database user}
 \usage{
-sebms_per_update_modified(my_uid)
+sebms_per_update_modified(my_usr_uid = 1, target_per_uid = 0)
 }
 \arguments{
-\item{my_uid}{Internal user id in SeBMS database; use param sebms_users("nrm_msk")$uid}
+\item{my_usr_uid}{Internal usr_user id in SeBMS database; use param sebms_users("nrm_msk")$uid}
+
+\item{target_per_uid}{Internal per_person id in SeBMS database}
 }
 \description{
 Update person data in database - setting new modified time and

@@ -1,6 +1,7 @@
 context("swedishbutterflies")
 
 test_that("data retrieval works", {
+  skip_on_travis()
   res <- sebms_species_per_year()
   expect_true(nrow(res) > 0)
 })
