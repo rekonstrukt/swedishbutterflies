@@ -88,21 +88,23 @@ sebms_users <- function(my_username = NULL) {
 #' Update person data in database - setting new modified time and
 #' database user 
 #' 
-#' @param my_uid Internal user id in SeBMS database; use param sebms_users("nrm_msk")$uid 
+#' @param my_usr_uid Internal usr_user id in SeBMS database; use param sebms_users("nrm_msk")$uid 
+#' @param target_per_uid Internal per_person id in SeBMS database
 #' @import dplyr
 #' @importFrom pool poolWithTransaction
 #' @importFrom DBI dbSendQuery dbClearResult
 #' @export
-sebms_per_update_modified <- function(my_uid) {
+sebms_per_update_modified <- function(my_usr_uid=1,target_per_uid=0) {
 
   sebms_assert_connection()
   
   s <- "UPDATE per_person 
     SET per_modifiedtime = CURRENT_TIMESTAMP, 
-    per_usr_modifiedbyid = $1;"
+    per_usr_modifiedbyid = $1
+    WHERE per_uid IN ($2);"
   
   poolWithTransaction(sebms_pool, function(conn) {
-    res <- dbSendQuery(conn, s, params = list(my_uid))
+    res <- dbSendQuery(conn, s, params = list(my_usr_uid, target_per_uid))
     DBI::dbClearResult(res)
   })
   
