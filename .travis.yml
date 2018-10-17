@@ -12,7 +12,6 @@ addons:
   apt:
     packages:
     - r-base-dev
-    - r-recommended
     - libxml2-dev
 before_install:
 - tlmgr install index
