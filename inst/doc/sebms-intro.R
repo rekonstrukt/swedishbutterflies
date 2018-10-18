@@ -163,7 +163,11 @@ gogogo <-
   filter(is_gogogo) %>%
   dplyr::select(id, is_gogogo, t, ws, tcc_mean, pmean, date)
 
-gogogo %>% head(5) %>% kable
+if (nrow(gogogo) == 0) {
+  message("No butterflies expected, winter is coming?")
+} else {
+  gogogo %>% head(5) %>% kable
+}
 
 
 ## ------------------------------------------------------------------------
@@ -180,7 +184,7 @@ sebms_sunhours_plot(rl = sun) %>%
 
 img <- image_read(fn_sun)
 unlink(fn_sun)
-img
+img %>% image_resize("700x")
 
 
 ## ------------------------------------------------------------------------
@@ -190,7 +194,7 @@ sebms_sunhours_plot(show_legend = TRUE) %>%
 
 img <- image_read(fn_sun)
 unlink(fn_sun)
-img
+img %>% image_resize("700x")
 
 ## ---- fig.width=7--------------------------------------------------------
 

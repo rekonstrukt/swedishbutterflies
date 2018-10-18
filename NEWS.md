@@ -6,6 +6,10 @@ For more fine-grained list of changes or to report a bug, consult
 * [The issues log](https://github.com/rekonstrukt/swedishbutterflies/issues)
 * [The commit log](https://github.com/rekonstrukt/swedishbutterflies/commits/master)
 
+# v 0.1.6
+
+* Minor update of package metadata and documentation (vignette), resolving issue #1
+
 # v 0.1.5
 
 * Activated travis-ci builds with tagged releases pushed to GitHub Releases
