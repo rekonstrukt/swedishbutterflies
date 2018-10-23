@@ -1,12 +1,12 @@
 Package: swedishbutterflies
 Title: Swedish Butterfly Monitoring Programme Tools
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: c(
     person("Markus", "Skyttner", email = "markus.skyttner@nrm.se", role = c("aut", "cre")),
     person("Lars", "Pettersson", role = c("aut"))
     )
 Description: Provides tools for working with data from the Swedish Butterfly Monitoring scheme.
-Depends: R (>= 3.4.4)
+Depends: R (>= 3.4.1)
 License: Affero GPLv3
 Encoding: UTF-8
 LazyData: true

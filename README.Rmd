@@ -35,6 +35,9 @@ install.packages("devtools")
 library(devtools)
 install_github("rekonstrukt/swedishbutterflies")
 
+# A specific versioned release can be installed like this:
+install_github("rekonstrukt/swedishbutterflies@0.1.6")
+
 ```
 
 ## Quick start
@@ -130,7 +133,7 @@ The long-form documentation / Vignette is located in `vignettes/sebms-intro.Rmd`
 
 ## Credits
 
-The package bundles code and data assembled and curated by Lars Pettersson at http://dagfjarilar.lu.se
+The package bundles code and data assembled and curated by Lars Petterson at https://dagfjarilar.lu.se
 
 ## Meta
 
