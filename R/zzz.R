@@ -6,7 +6,7 @@ sebms_pool <- NULL
   # echo "butterflies" | toilet -f cricket
   
   welcome <-
-"https://dagfjarilar.lu.se__ __         __    
+"http://dagfjarilar.lu.se__ __         __    
 .-----.--.--.--.-----.--|  |__|.-----.|  |--.
 |__ --|  |  |  |  -__|  _  |  ||__ --||     |
 |_____|________|_____|_____|__||_____||__|__|

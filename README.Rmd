@@ -133,7 +133,7 @@ The long-form documentation / Vignette is located in `vignettes/sebms-intro.Rmd`
 
 ## Credits
 
-The package bundles code and data assembled and curated by Lars Petterson at https://dagfjarilar.lu.se
+The package bundles code and data assembled and curated by Lars Pettersson at http://dagfjarilar.lu.se
 
 ## Meta
 

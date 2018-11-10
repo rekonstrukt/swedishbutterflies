@@ -146,7 +146,7 @@ Credits
 -------
 
 The package bundles code and data assembled and curated by Lars
-Petterson at <https://dagfjarilar.lu.se>
+Pettersson at <http://dagfjarilar.lu.se>
 
 Meta
 ----

@@ -35,3 +35,15 @@ test_that("naturum climate data works", {
   expect_gt(nrow(df), 0)
 })
 
+test_that("path to config file does not contain '/' on win", {
+  
+  if (rappdirs:::get_os() != "win") skip("Not on win OS, skipping.")
+  
+  cfgfile <- file.path(rappdirs::app_dir("sebms")$config(), "config.yml")
+  cfgfile <- normalizePath(cfgfile)
+  
+  has_nonwinslash <- grepl(cfgfile, "/", fixed = TRUE)
+  
+  expect_true(!has_nonwinslash)
+    
+})

@@ -8,6 +8,8 @@ sebms_connect <- function() {
   #t <- try(config <- config::get("sebms", file = cfgfile))
   #if (inherits(t, "try-error")) alternativeFunction()
   cfgfile <- file.path(rappdirs::app_dir("sebms")$config(), "config.yml")
+  cfgfile <- normalizePath(cfgfile)
+
   tryCatch(config <- config::get(NULL, "sebms", file = cfgfile), 
     error = function(e) {
       if (!dir.exists(dirname(cfgfile))) 
